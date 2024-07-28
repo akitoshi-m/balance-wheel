@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useRef, useState } from "react";
 import { Radar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -9,8 +9,25 @@ import {
   Tooltip,
   Legend
 } from 'chart.js';
-import { Slider, TextField, Typography, Container, Grid, Button, Divider, List, ListItem, ListItemAvatar, ListItemText, Avatar } from "@mui/material";
-import { AttachMoney, FamilyRestroom, HealthAndSafety, Home, People, School, SportsEsports, Work } from "@mui/icons-material";
+import {
+  Slider,
+  TextField,
+  Typography,
+  Container,
+  Grid,
+  Button,
+  Divider,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Avatar,
+  Snackbar,
+  IconButton,
+  Alert
+} from "@mui/material";
+import { AttachMoney, Close, FamilyRestroom, HealthAndSafety, Home, People, School, SportsEsports, Work } from "@mui/icons-material";
+import html2canvas from "html2canvas";
 
 ChartJS.register(
   RadialLinearScale,
@@ -81,6 +98,8 @@ const initialValues = [5, 5, 5, 5, 5, 5, 5, 5];
 const RadarChart: React.FC = () => {
   const [values, setValues] = useState<number[]>(initialValues);
   const [textFields, setTextFields] = useState<string[]>(Array(initialValues.length).fill(""));
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const printRef = useRef<HTMLDivElement>(null);
 
   const data = {
     labels: Object.keys(category).map((key) => categoryNames(category[key as keyof typeof category])),
@@ -105,6 +124,7 @@ const RadarChart: React.FC = () => {
   };
 
   const currentDate = new Date();
+  const formattedDate = `${currentDate.getFullYear()}${(currentDate.getMonth() + 1).toString().padStart(2, '0')}${currentDate.getDate().toString().padStart(2, '0')}`;
 
   const handleSliderChange = (index: number, newValue: number) => {
     const newValues = [...values];
@@ -118,49 +138,113 @@ const RadarChart: React.FC = () => {
     setTextFields(newTextFields);
   };
 
+  const handleSaveAsImage = () => {
+    if (printRef.current) {
+      html2canvas(printRef.current, { useCORS: true, logging: true }).then((canvas) => {
+        const link = document.createElement('a');
+        link.href = canvas.toDataURL('image/png');
+        link.download = `${formattedDate}_wheel_of_life.png`;
+        link.click();
+        setSnackbarOpen(true);
+      }).catch((error) => {
+        console.error("Error capturing image:", error);
+      });
+    }
+  };
+
+  const handleCloseSnackbar = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackbarOpen(false);
+  };
+
   return (
-    <Container sx={{ width: '80%' }}>
+    <Container sx={{ width: '100%' }}>
       <Typography variant="h4" sx={{ p: 2, fontWeight: 'bold' }}>
         人生の輪 作成ツール
       </Typography>
 
-      <Grid container spacing={2}>
-        <Grid item xs={6}>
-          <Radar data={data} options={options} />
-        </Grid>
+      <div ref={printRef} style={{ margin: 2 }}>
 
-        <Grid item xs={6}>
-          <Typography variant="h6" sx={{ textAlign: 'start'}}>
-            作成日: {currentDate.getFullYear()}年{currentDate.getMonth() + 1}月{currentDate.getDate()}日
-          </Typography>
-          <List>
-            {Object.values(category).map((catType) => (
-              <ListItem alignItems="flex-start">
-                <ListItemAvatar>
-                  <Avatar>
-                    {categoryIcons(catType)}
-                  </Avatar>
-                </ListItemAvatar>
-                <ListItemText
-                  primary={categoryNames(catType)}
-                  secondary={
-                    <Typography
-                      sx={{ display: 'inline' }}
-                      component="span"
-                      variant="overline"
-                      color="text.primary"
-                    >
-                      {textFields[catType]}
-                    </Typography>
-                  }
-                />
-              </ListItem>
-            ))}
-          </List>
-        </Grid>
-      </Grid>
+        <Grid container spacing={2} justifyContent="center">
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Typography variant="h5">
+              人生の輪
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Typography variant="h6">
+              {currentDate.getFullYear()}年{currentDate.getMonth() + 1}月{currentDate.getDate()}日
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{ width: '60%' }}>
+              <Radar data={data} options={options} />
+            </div>
+          </Grid>
 
-      <Button variant="contained" sx={{ m: 2 }}>
+          <Grid item xs={12}>
+            <Grid container spacing={2}>
+              <Grid item xs={6}>
+                <List>
+                  {Object.values(category).slice(0, 4).map((catType, index) => (
+                    <ListItem alignItems="flex-start" key={index}>
+                      <ListItemAvatar>
+                        <Avatar>
+                          {categoryIcons(catType)}
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={categoryNames(catType)}
+                        secondary={
+                          <Typography
+                            sx={{ display: 'inline', lineHeight: 1.0 }}
+                            component="span"
+                            variant="overline"
+                            color="text.primary"
+                          >
+                            {textFields[catType]}
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Grid>
+              <Grid item xs={6}>
+                <List>
+                  {Object.values(category).slice(4).map((catType, index) => (
+                    <ListItem alignItems="flex-start" key={index}>
+                      <ListItemAvatar>
+                        <Avatar>
+                          {categoryIcons(catType)}
+                        </Avatar>
+                      </ListItemAvatar>
+                      <ListItemText
+                        primary={categoryNames(catType)}
+                        secondary={
+                          <Typography
+                          sx={{ display: 'inline', lineHeight: 1.2 }}
+                            component="span"
+                            variant="overline"
+                            color="text.primary"
+                          >
+                            {textFields[catType]}
+                          </Typography>
+                        }
+                      />
+                    </ListItem>
+                  ))}
+                </List>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      </div>
+
+      <Button variant="contained" sx={{ m: 2 }} onClick={handleSaveAsImage}>
         画像として保存する
       </Button>
       <Divider>
@@ -204,6 +288,20 @@ const RadarChart: React.FC = () => {
           </React.Fragment>
         ))}
       </Grid>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          variant="filled"
+          sx={{ width: '100%' }}
+        >
+          保存しました！
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }
