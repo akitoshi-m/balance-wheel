@@ -119,8 +119,6 @@ const RadarChart: React.FC = () => {
       {
         label: "満足度",
         data: values,
-        // backgroundColor: "rgba(212, 93, 135, 0.4)",
-        // borderColor: "rgba(212, 93, 135, 1)",
         ...selectedColor,
         borderWidth: 1
       }

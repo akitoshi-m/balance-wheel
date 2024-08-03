@@ -3,7 +3,7 @@ const Footer = () => {
     <footer
       style={{
         padding: "12px",
-        marginTop: "12px",
+        marginTop: "24px",
         backgroundColor: "#f0f0f0",
         textAlign: "center",
       }}
