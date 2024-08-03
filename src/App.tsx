@@ -1,13 +1,13 @@
 import './App.css';
 import Footer from './components/Footer';
 import WheelOfLife from './components/WheelOfLife';
+import Header from './components/Header';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <WheelOfLife />
-      </header>
+      <Header />
+      <WheelOfLife />
       <Footer />
     </div>
   );

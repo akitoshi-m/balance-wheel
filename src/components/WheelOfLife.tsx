@@ -23,10 +23,9 @@ import {
   ListItemText,
   Avatar,
   Snackbar,
-  IconButton,
   Alert
 } from "@mui/material";
-import { AttachMoney, Close, FamilyRestroom, HealthAndSafety, Home, People, School, SportsEsports, Work } from "@mui/icons-material";
+import { AttachMoney, FamilyRestroom, HealthAndSafety, Home, People, School, SportsEsports, Work } from "@mui/icons-material";
 import html2canvas from "html2canvas";
 
 ChartJS.register(
@@ -94,12 +93,25 @@ const categoryIcons = (categoryType: CategoryTypes): JSX.Element => {
 };
 
 const initialValues = [5, 5, 5, 5, 5, 5, 5, 5];
+export type colorSet = {
+  backgroundColor: string,
+  borderColor: string,
+}
+const colorOptions: { name: string; colors: colorSet }[] = [
+  { name: "Blue", colors: { backgroundColor: "rgba(54, 124, 190, 0.4)", borderColor: "rgba(54, 124, 190, 1)" } },
+  { name: "Red", colors: { backgroundColor: "rgba(212, 93, 135, 0.4)", borderColor: "rgba(212, 93, 135, 1)" } },
+  { name: "Green", colors: { backgroundColor: "rgba(27, 164, 102, 0.4)", borderColor: "rgba(27, 164, 102, 1)" } },
+];
 
 const RadarChart: React.FC = () => {
   const [values, setValues] = useState<number[]>(initialValues);
   const [textFields, setTextFields] = useState<string[]>(Array(initialValues.length).fill(""));
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const printRef = useRef<HTMLDivElement>(null);
+  const [selectedColor, setSelectedColor] = useState<colorSet>(colorOptions[0].colors);
+  const handleColorChange = (colors: colorSet) => {
+    setSelectedColor(colors);
+  };
 
   const data = {
     labels: Object.keys(category).map((key) => categoryNames(category[key as keyof typeof category])),
@@ -107,8 +119,9 @@ const RadarChart: React.FC = () => {
       {
         label: "満足度",
         data: values,
-        backgroundColor: "rgba(54, 162, 235, 0.2)",
-        borderColor: "rgba(54, 162, 235, 1)",
+        // backgroundColor: "rgba(212, 93, 135, 0.4)",
+        // borderColor: "rgba(212, 93, 135, 1)",
+        ...selectedColor,
         borderWidth: 1
       }
     ]
@@ -161,21 +174,14 @@ const RadarChart: React.FC = () => {
   };
 
   return (
-    <Container sx={{ width: '100%' }}>
-      <Typography variant="h4" sx={{ p: 2, fontWeight: 'bold' }}>
-        人生の輪 作成ツール
-      </Typography>
-
+    <Container>
       <div ref={printRef} style={{ margin: 2 }}>
-
         <Grid container spacing={2} justifyContent="center">
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Typography variant="h5">
+          <Grid item xs={6} sx={{ textAlign: "center", padding: "20px 0" }}>
+            <Typography variant="h4" sx={{ fontWeight: "bold", marginBottom: "8px" }}>
               人生の輪
             </Typography>
-          </Grid>
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-            <Typography variant="h6">
+            <Typography variant="h6" sx={{ color: "#757575" }}>
               {currentDate.getFullYear()}年{currentDate.getMonth() + 1}月{currentDate.getDate()}日
             </Typography>
           </Grid>
@@ -186,53 +192,57 @@ const RadarChart: React.FC = () => {
           </Grid>
 
           <Grid item xs={12}>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
+            <Grid container spacing={2} justifyContent="center" alignItems="center">
+              <Grid item xs={5}>
                 <List>
                   {Object.values(category).slice(0, 4).map((catType, index) => (
                     <ListItem alignItems="flex-start" key={index}>
                       <ListItemAvatar>
-                        <Avatar>
-                          {categoryIcons(catType)}
-                        </Avatar>
+                      <Avatar
+                        sx={{
+                          backgroundColor: selectedColor.borderColor,
+                        }}
+                      >
+                        {categoryIcons(catType)}
+                      </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={categoryNames(catType)}
                         secondary={
-                          <Typography
-                            sx={{ display: 'inline', lineHeight: 1.0 }}
-                            component="span"
-                            variant="overline"
-                            color="text.primary"
-                          >
-                            {textFields[catType]}
-                          </Typography>
+                          textFields[catType].split("\n").map((line, idx) => (
+                            <React.Fragment key={idx}>
+                              {line}
+                              <br />
+                            </React.Fragment>
+                          ))
                         }
                       />
                     </ListItem>
                   ))}
                 </List>
               </Grid>
-              <Grid item xs={6}>
+              <Grid item xs={5}>
                 <List>
                   {Object.values(category).slice(4).map((catType, index) => (
                     <ListItem alignItems="flex-start" key={index}>
                       <ListItemAvatar>
-                        <Avatar>
-                          {categoryIcons(catType)}
-                        </Avatar>
+                      <Avatar
+                        sx={{
+                          backgroundColor: selectedColor.borderColor,
+                        }}
+                      >
+                        {categoryIcons(catType)}
+                      </Avatar>
                       </ListItemAvatar>
                       <ListItemText
                         primary={categoryNames(catType)}
                         secondary={
-                          <Typography
-                          sx={{ display: 'inline', lineHeight: 1.2 }}
-                            component="span"
-                            variant="overline"
-                            color="text.primary"
-                          >
-                            {textFields[catType]}
-                          </Typography>
+                          textFields[catType].split("\n").map((line, idx) => (
+                            <React.Fragment key={idx}>
+                              {line}
+                              <br />
+                            </React.Fragment>
+                          ))
                         }
                       />
                     </ListItem>
@@ -244,7 +254,7 @@ const RadarChart: React.FC = () => {
         </Grid>
       </div>
 
-      <Button variant="contained" sx={{ m: 2 }} onClick={handleSaveAsImage}>
+      <Button variant="outlined" sx={{ m: 2 }} onClick={handleSaveAsImage}>
         画像として保存する
       </Button>
       <Divider>
@@ -252,6 +262,30 @@ const RadarChart: React.FC = () => {
           以下、入力項目
         </Typography>
       </Divider>
+      <Typography align="center" sx={{ mt: 2 }}>
+        チャートの色選択
+      </Typography>
+
+      <Grid container spacing={2} justifyContent="center" alignItems="center" sx={{ marginBottom: 4 }}>
+        {colorOptions.map((option, index) => (
+          <Grid item key={index}>
+            <Button
+              variant="contained"
+              onClick={() => handleColorChange(option.colors)}
+              sx={{
+                backgroundColor: option.colors.borderColor,
+                color: '#fff',
+                minWidth: '80px',
+                '&:hover': {
+                  backgroundColor: option.colors.borderColor,
+                },
+              }}
+            >
+              {option.name}
+            </Button>
+          </Grid>
+        ))}
+      </Grid>
       <Grid container spacing={2} alignItems="center">
         {Object.values(category).map((catType, index) => (
           <React.Fragment key={catType}>
@@ -296,7 +330,6 @@ const RadarChart: React.FC = () => {
         <Alert
           onClose={handleCloseSnackbar}
           severity="success"
-          variant="filled"
           sx={{ width: '100%' }}
         >
           保存しました！
