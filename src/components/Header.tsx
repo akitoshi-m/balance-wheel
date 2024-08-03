@@ -73,7 +73,7 @@ const Header = () => {
           <Box sx={{ mb: 2 }}>
             <Typography variant="body1" gutterBottom>
               画面を下にスクロールしたところに入力項目があります。<br />
-              各項目に対して満足度と、<strong>どうしてその点数をつけたのかの理由や現状</strong>などを書きましょう。
+              各項目に対して<strong>満足度</strong>と、<strong>どうしてその点数をつけたのかの理由や現状</strong>などを書きましょう。
               記入すると自動的に画面上部に表示がされます。<br /><br />
               作成が完了したら「画像として保存する」から画像で保存しておきましょう。<br />
             </Typography>
