@@ -154,7 +154,7 @@ const RadarChart: React.FC = () => {
       html2canvas(printRef.current, { useCORS: true, logging: true }).then((canvas) => {
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
-        link.download = `${formattedDate}_wheel_of_life.png`;
+        link.download = `${formattedDate}_balance_wheel.png`;
         link.click();
         setSnackbarOpen(true);
       }).catch((error) => {

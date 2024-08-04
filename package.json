@@ -1,5 +1,5 @@
 {
-  "name": "wheel-of-life",
+  "name": "balance-wheel",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -50,5 +50,5 @@
       "last 1 safari version"
     ]
   },
-  "homepage": "https://akitoshi-m.github.io/balance-wheel/"
+  "homepage": "https://www.balance-wheel.work"
 }
